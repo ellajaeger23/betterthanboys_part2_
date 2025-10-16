@@ -8,8 +8,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Login page example">
     <meta name="keywords" content="login form, CSS, responsive design">
-    <meta name="author" content="AT">
-    <title>Doki's Management System</title>
+    <meta name="author" content="Mino">
+    <title>Login Page</title>
     <link rel="stylesheet" type="text/css" href="styles/style.css">
     <style>
         
@@ -20,7 +20,7 @@
         label {
             margin-bottom: 10px;
             font-weight: bold;
-            color: #2c3e50;
+            color: #ffffffff;
         }
         input[type="text"],
         input[type="password"] {

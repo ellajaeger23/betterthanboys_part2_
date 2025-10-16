@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $_SESSION['username'] = $user['username'];
 
         // Redirect Admin to manage.php
-        if ($user['username'] == 'admin') {
+        if ($user['username'] == 'Admin') {
             header('Location: manage.php');
             exit;
         } else {

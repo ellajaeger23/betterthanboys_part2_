@@ -1,8 +1,19 @@
+<?php
+require_once("settings.php");
+$conn = mysqli_connect($host, $user, $pwd, $sql_db);
+
+if (!$conn) {
+    die("❌ Database connection failed: " . mysqli_connect_error());
+}
+
+$sql = "SELECT * FROM jobs";
+$result = mysqli_query($conn, $sql);
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="author" content="Allison Heath, Ella Jaeger" />
+  <meta name="author" content="Uyen Nguyen, Ella Jaeger" />
   <meta name="keywords" content="work, jobs, team, careers" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="styles/style.css" />
@@ -10,7 +21,7 @@
 </head>
 
 <body id="jobs">
-  
+
   <!-- Include Header -->
   <?php include("header.inc"); ?>
 
@@ -28,100 +39,60 @@
       </p>
     </aside>
 
+    <?php
+    if (mysqli_num_rows($result) > 0) {
+        while ($row = mysqli_fetch_assoc($result)) {
+            echo "<section>";
+            echo "<h2>" . htmlspecialchars($row['job_title']) . "</h2>";
+            echo "<article>";
+            echo "<h3>Reference: <code>" . htmlspecialchars($row['job_ref']) . "</code></h3>";
+            echo "<p>" . nl2br(htmlspecialchars($row['description'])) . "</p>";
+            echo "<p><strong>Salary:</strong> " . htmlspecialchars($row['salary']) . "</p>";
+            echo "<p><strong>Reporting line:</strong> " . htmlspecialchars($row['reporting_line']) . "</p>";
 
+            // Responsibilities
+            echo "<h3>Key responsibilities</h3><ol>";
+            $tasks = explode(';', $row['responsibilities']);
+            foreach ($tasks as $task) {
+                echo "<li>" . htmlspecialchars(trim($task)) . "</li>";
+            }
+            echo "</ol>";
 
-    <!-- Role 1 -->
-    <section>
-      <h2 id="etd">Educational Technology Developer</h2>
-      <article>
-        <h3 id="etd-ref">Reference: <code>ED001</code></h3>
-        <p>
-          Design and maintain digital platforms that support teaching, learning, and research at the university.
-          Work closely with academic staff to deliver accessible and engaging online learning experiences.
-        </p>
-        <p><strong>Salary:</strong> $50K – $80K (pro-rata for part-time)</p>
-        <p><strong>Reporting line:</strong> Reports to the Digital Learning Lead</p>
+            // Essential requirements
+            echo "<h3>Essential requirements</h3><ul>";
+            $essentials = explode(';', $row['essential_requirements']);
+            foreach ($essentials as $req) {
+                echo "<li>" . htmlspecialchars(trim($req)) . "</li>";
+            }
+            echo "</ul>";
 
-        <h3>Key responsibilities</h3>
-        <ol>
-          <li>Develop and support online course platforms and digital learning tools.</li>
-          <li>Ensure systems meet accessibility and usability standards.</li>
-          <li>Work with faculty to create interactive learning resources.</li>
-          <li>Maintain integrations with the Learning Management System (LMS).</li>
-          <li>Support continuous improvement in teaching technology.</li>
-        </ol>
+            // Preferable requirements
+            echo "<h3>Preferable (nice to have)</h3><ul>";
+            $prefs = explode(';', $row['preferable_requirements']);
+            foreach ($prefs as $pref) {
+                echo "<li>" . htmlspecialchars(trim($pref)) . "</li>";
+            }
+            echo "</ul>";
 
-        <h3>Essential requirements</h3>
-        <ul>
-          <li>Proficiency in HTML, CSS, JavaScript.</li>
-          <li>Experience with LMS platforms (e.g., Canvas, Moodle, Blackboard).</li>
-          <li>Strong problem-solving and troubleshooting skills.</li>
-          <li>Ability to communicate effectively with academic and technical staff.</li>
-        </ul>
+            echo "<p><a class='btn' href='apply.php?job_ref=" . urlencode($row['job_ref']) . "'>Click to apply</a></p>";
+            echo "</article></section>";
+        }
+    } else {
+        echo "<p>No jobs available right now.</p>";
+    }
 
-        <h3>Preferable (nice to have)</h3>
-        <ul>
-          <li>Familiarity with e-learning standards (SCORM, xAPI).</li>
-          <li>Experience with data analytics for learning research.</li>
-          <li>Knowledge of accessibility guidelines (WCAG).</li>
-        </ul>
-
-        <p>
-          <a class="btn" href="apply.html" aria-label="Apply for Educational Technology Developer (EDT001)">Click to apply</a>
-        </p>
-      </article>
-    </section>
-
-    <section>
-      <h2 id="dlso">Digital Learning Support Officer</h2>
-      <article>
-        <h3 id="dlso-ref">Reference: <code>DL002</code></h3>
-        <p>
-          Provide technical and day to day support for students and staff using digital learning tools.
-          Assist with troubleshooting, training, and setup of online and blended learning environments.
-        </p>
-        <p><strong>Salary:</strong> $30K – $50K</p>
-        <p><strong>Reporting line:</strong> Reports to the Digital Learning Lead</p>
-
-        <h3>Key responsibilities</h3>
-        <ol>
-          <li>Provide first-level support for LMS and digital learning tools.</li>
-          <li>Assist staff and students with account setup and troubleshooting.</li>
-          <li>Maintain records of support requests and resolutions.</li>
-          <li>Deliver basic training on digital learning systems.</li>
-          <li>Escalate complex issues to senior technical staff.</li>
-        </ol>
-
-        <h3>Essential requirements</h3>
-        <ul>
-          <li>Basic knowledge of computers and web platforms.</li>
-          <li>Good communication and interpersonal skills.</li>
-          <li>Ability to troubleshoot common digital learning issues.</li>
-        </ul>
-
-        <h3>Preferable (nice to have)</h3>
-        <ul>
-          <li>Familiarity with university LMS systems.</li>
-          <li>Understanding of digital research tools (e.g., Zotero, EndNote).</li>
-          <li>Interest in education technology and learning support.</li>
-        </ul>
-
-        <p>
-          <a class="btn" href="apply.html" aria-label="Apply for Digital Learning Support Officer (DLS002)">Click to apply</a>
-        </p>
-      </article>
-    </section>
+    mysqli_close($conn);
+    ?>
   </main>
 
-  <!-- Decorative characters/images -->
   <div class="decorations">
     <img src="styles/Photo/cat.png" alt="Pixel cat mascot" class="cat">
     <img src="styles/Photo/doodle1.png" alt="Doodle decoration" class="doodle-left">
     <img src="styles/Photo/doodle2.png" alt="Doodle decoration 1" class="doodle-right">
   </div>
 
-   <!-- Include Footer -->
-   <?php include("footer.inc"); ?>
+  <!-- Include Footer -->
+  <?php include("footer.inc"); ?>
 
 </body>
 </html>
