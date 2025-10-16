@@ -7,46 +7,65 @@ require_once("settings.php");
 // Create a connection to the database
 $conn = mysqli_connect($host, $user, $pwd, $sql_db);
 
-// Check if the connection was successful
+// Check connection
 if (!$conn) {
     die("Database connection failed: " . mysqli_connect_error());
 }
 
-// Check if the form was submitted using POST method
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Get the input values from the login form and remove extra spaces
+// Check if form was submitted
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Get and sanitize input
     $input_username = trim($_POST['username']);
     $input_password = trim($_POST['password']);
 
-    // Use prepared statements to prevent SQL injection
-    $query = "SELECT * FROM users WHERE username = ? AND password = ?";
+    // Prepared statement to fetch user by username
+    $query = "SELECT * FROM users WHERE username = ?";
     $stmt = mysqli_prepare($conn, $query);
-    mysqli_stmt_bind_param($stmt, "ss", $input_username, $input_password);
+    mysqli_stmt_bind_param($stmt, "s", $input_username);
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
 
-    // If a matching user is found
     if ($user = mysqli_fetch_assoc($result)) {
-        // Save username to session
-        $_SESSION['username'] = $user['username'];
+        // ⚠️ Plain-text password check (no hashing)
+        if ($input_password === $user['password']) {
 
-        // Redirect Admin to manage.php
-        if ($user['username'] == 'Admin') {
-            header('Location: manage.php');
-            exit;
+            // Store login info in session
+            $_SESSION['username'] = $user['username'];
+
+            // Assign role automatically
+            if ($user['username'] === 'Admin') {
+                $_SESSION['role'] = 'Admin';
+            } elseif ($user['username'] === 'Manager') {
+                $_SESSION['role'] = 'Manager';
+            } else {
+                $_SESSION['role'] = 'User';
+            }
+
+            // Security: regenerate session ID
+            session_regenerate_id(true);
+
+            // Redirect based on role
+            if ($_SESSION['role'] === 'Admin' || $_SESSION['role'] === 'Manager') {
+                header("Location: manage.php");
+                exit;
+            } else {
+                header("Location: index.php");
+                exit;
+            }
+
         } else {
-            // Other users (if any)
-            header('Location: index.php');
+            $_SESSION['error'] = "❌ Invalid username or password.";
+            header("Location: login.php");
             exit;
         }
     } else {
-        // Invalid credentials
-        $_SESSION['error'] = "❌ Invalid username or password.";
-        header('Location: login.php');
+        $_SESSION['error'] = "❌ User not found.";
+        header("Location: login.php");
         exit;
     }
 
     mysqli_stmt_close($stmt);
 }
+
 mysqli_close($conn);
 ?>

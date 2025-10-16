@@ -15,15 +15,21 @@ if (!$conn) {
     die("<p class='error'>❌ Database connection failed: " . mysqli_connect_error() . "</p>");
 }
 
-// --- Handle delete by job reference ---
-if (isset($_POST['delete_ref'])) {
+$username = $_SESSION['username'];
+$isAdmin = ($username === 'Admin');
+$isManager = ($username === 'Manager');
+
+// --- Handle delete by job reference (Admin only) ---
+if ($isAdmin && isset($_POST['delete_ref'])) {
     $delete_ref = trim($_POST['delete_ref']);
     $delete_query = "DELETE FROM eoi WHERE job_ref = ?";
     $stmt = mysqli_prepare($conn, $delete_query);
     mysqli_stmt_bind_param($stmt, 's', $delete_ref);
     mysqli_stmt_execute($stmt);
-    echo "<p class='notice' style='color:#d64c6c;'>Deleted all EOIs for Job Reference: $delete_ref</p>";
+    echo "<p class='notice delete'>Deleted all EOIs for Job Reference: " . htmlspecialchars($delete_ref) . "</p>";
     mysqli_stmt_close($stmt);
+} elseif ($isManager && isset($_POST['delete_ref'])) {
+    echo "<p class='notice warning'>Managers are not allowed to delete EOIs.</p>";
 }
 
 // --- Handle status update ---
@@ -34,16 +40,15 @@ if (isset($_POST['update_eoi']) && isset($_POST['new_status'])) {
     $stmt = mysqli_prepare($conn, $update_query);
     mysqli_stmt_bind_param($stmt, 'si', $new_status, $eoi_id);
     mysqli_stmt_execute($stmt);
-    echo "<p class='notice' style='color:green;'>Updated EOI #$eoi_id to status: $new_status</p>";
+    echo "<p class='notice success'>Updated EOI #$eoi_id to status: $new_status</p>";
     mysqli_stmt_close($stmt);
 }
 
-// --- Build the query for listing EOIs ---
+// --- Filters & sorting ---
 $where_clauses = [];
 $params = [];
 $types = "";
 
-// Filters
 if (!empty($_POST['job_ref'])) {
     $where_clauses[] = "job_ref = ?";
     $params[] = $_POST['job_ref'];
@@ -60,13 +65,11 @@ if (!empty($_POST['lastname'])) {
     $types .= "s";
 }
 
-// --- Sorting (safe) ---
 $allowed_fields = ['EOInumber', 'firstname', 'lastname', 'job_ref', 'status'];
 $sort_field = isset($_POST['sort_field']) && in_array($_POST['sort_field'], $allowed_fields)
     ? $_POST['sort_field']
     : 'EOInumber';
 
-// Build SQL
 $sql = "SELECT * FROM eoi";
 if (count($where_clauses) > 0) {
     $sql .= " WHERE " . implode(" AND ", $where_clauses);
@@ -104,6 +107,9 @@ $result = mysqli_stmt_get_result($stmt);
         h1, h2 {
             text-align: center;
             color: #d64c6c;
+        }
+        p {
+            text-align: center;
         }
         fieldset {
             border: 1px solid #f5c3cb;
@@ -178,31 +184,37 @@ $result = mysqli_stmt_get_result($stmt);
             border-radius: 5px;
             width: fit-content;
         }
+        .notice.success { border-left-color: green; background: #e9fbe9; }
+        .notice.delete { border-left-color: #d64c6c; background: #fde5e8; }
+        .notice.warning { border-left-color: #f39c12; background: #fff3cd; }
+
+        .logout-btn {
+            display: inline-block;
+            background-color: #d64c6c;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.2s ease;
+        }
+        .logout-btn:hover {
+            background-color: #c23c5d;
+        }
     </style>
 </head>
 <body>
 <?php include "header.inc"; ?>
 
 <section>
-    <h1>Welcome, Admin</h1>
-<div style="text-align:center; margin-bottom: 20px;">
-    <a href="logout.php" 
-       style="
-           display: inline-block;
-           background-color: #d64c6c;
-           color: #fff;
-           padding: 10px 20px;
-           border-radius: 5px;
-           text-decoration: none;
-           font-weight: bold;
-           transition: background-color 0.2s ease;
-       "
-       onmouseover="this.style.backgroundColor='#c23c5d'"
-       onmouseout="this.style.backgroundColor='#d64c6c'">
-       🔒 Logout
-    </a>
-</div>
-    <p style="text-align:center;">Manage all Expressions of Interest (EOIs) below.</p>
+    <h1>Welcome, <?= htmlspecialchars($username); ?> 👋</h1>
+    <p>Role: <?= $isAdmin ? 'Administrator' : 'Manager'; ?></p>
+
+    <div style="text-align:center; margin-bottom: 20px;">
+        <a href="logout.php" class="logout-btn">🔒 Logout</a>
+    </div>
+
+    <p>Manage all Expressions of Interest (EOIs) below.</p>
 
     <!-- Filter and Sort Form -->
     <form method="post" action="manage.php">
@@ -227,11 +239,9 @@ $result = mysqli_stmt_get_result($stmt);
 
             <label>Sort by:
                 <select name="sort_field">
-                    <option value="EOInumber" <?= ($sort_field == 'EOInumber') ? 'selected' : '' ?>>EOI Number</option>
-                    <option value="firstname" <?= ($sort_field == 'firstname') ? 'selected' : '' ?>>First Name</option>
-                    <option value="lastname" <?= ($sort_field == 'lastname') ? 'selected' : '' ?>>Last Name</option>
-                    <option value="job_ref" <?= ($sort_field == 'job_ref') ? 'selected' : '' ?>>Job Reference</option>
-                    <option value="status" <?= ($sort_field == 'status') ? 'selected' : '' ?>>Status</option>
+                    <?php foreach ($allowed_fields as $field): ?>
+                        <option value="<?= $field ?>" <?= ($sort_field == $field) ? 'selected' : '' ?>><?= ucfirst($field) ?></option>
+                    <?php endforeach; ?>
                 </select>
             </label>
 
@@ -239,10 +249,11 @@ $result = mysqli_stmt_get_result($stmt);
         </fieldset>
     </form>
 
+    <?php if ($isAdmin): ?>
     <!-- Delete EOIs by Job Reference -->
     <form method="post" action="manage.php">
         <fieldset>
-            <legend>Delete EOIs by Job Reference</legend>
+            <legend>Delete EOIs by Job Reference (Admin Only)</legend>
             <label>Job Reference:
                 <select name="delete_ref" required>
                     <option value="">Select...</option>
@@ -253,6 +264,7 @@ $result = mysqli_stmt_get_result($stmt);
             <button type="submit">Delete</button>
         </fieldset>
     </form>
+    <?php endif; ?>
 
     <hr>
 

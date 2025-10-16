@@ -12,7 +12,6 @@
     <title>Login Page</title>
     <link rel="stylesheet" type="text/css" href="styles/style.css">
     <style>
-        
         form {
             display: flex;
             flex-direction: column;
@@ -37,6 +36,11 @@
             border: none;
             background-color: #d64c6c;
             color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #c23c5d;
         }
         .error {
             color: #d64c6c;
@@ -44,6 +48,19 @@
             padding: 10px;
             margin-bottom: 20px;
             border-radius: 5px;
+        }
+        /* New part: link style */
+        .register-link {
+            text-align: center;
+            margin-top: 15px;
+        }
+        .register-link a {
+            color: #d64c6c;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .register-link a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
@@ -54,8 +71,8 @@
     <section id="login-main">
         <h1>Login</h1>
         <?php
-            if(isset($_SESSION['error'])){
-                echo '<div>' .$_SESSION['error']. '</div>';
+            if (isset($_SESSION['error'])) {
+                echo '<div class="error">' . $_SESSION['error'] . '</div>';
                 unset($_SESSION['error']);
             }
         ?>
@@ -68,9 +85,14 @@
 
             <input type="submit" value="Login">
         </form>
+
+        <!--registration link -->
+        <div class="register-link">
+            <p>Don't have an account? <a href="registration.php">Create one here</a>.</p>
+        </div>
     </section>
     <?php 
-    include 'footer.inc';
+        include 'footer.inc';
     ?>
 </body>
 </html>
