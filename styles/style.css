@@ -1,0 +1,584 @@
+/* =======================
+   GLOBAL RESET & BASICS
+   ======================= */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Courier New", monospace;
+    background: black;
+    color: white;
+    line-height: 1.6;
+}
+
+/* Global link styling */
+a {
+    color: white;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+a:hover {
+    color: #ff99cc;
+    text-decoration: underline;
+}
+
+/* =======================
+   NAVIGATION (Shared)
+   ======================= */
+nav {
+    display: flex;                   /* logo + menu on one line */
+    justify-content: space-between;  /* logo left, menu right */
+    align-items: center;
+    padding: 1rem 3rem;
+    background-image: url("Photo/nav.png"); 
+    background-size: cover;      /* scale to fill */
+    background-position: center; /* keep centered */
+    background-repeat: no-repeat; /* don’t tile */
+    width: 100%;                 /* stretch full width */
+}
+
+#index-nav {
+    background: none;
+}
+
+nav img.logo {
+    max-width: 280px;
+    height: auto; /* prevent squishing */
+}
+
+nav .menu {
+    list-style: none;
+    display: flex;
+    gap: 2rem;
+}
+
+nav .menu li a {
+    color: white;
+    text-decoration: none;
+    font-size: 1.2rem;
+}
+
+nav .menu li a:hover {
+    text-decoration: underline;
+    color: #ff99cc;
+}
+
+
+
+/* =======================
+   FOOTER (Shared)
+   ======================= */
+footer {
+    text-align: center;
+    font-size: 0.8rem;
+    padding: 1rem;
+    color: #ccc;
+}
+
+/* =======================
+   INDEX PAGE
+   ======================= */
+body.index {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+}
+
+.top-section {
+    background-image: url("Photo/background.png");
+    background-size: cover;
+    background-position: center;
+}
+
+/* Hero section */
+.hero {
+    padding: 4rem 2rem;
+}
+
+.hero h1 {
+    font-size: 3rem;
+    font-family: "Press Start 2P", monospace;
+    letter-spacing: 2px;
+}
+
+.hero .tagline {
+    font-size: 1rem;
+    margin: 1rem 0;
+    font-weight: bold;
+}
+
+.hero .intro {
+    max-width: 700px;
+    margin: 1rem auto;
+    font-size: 1.1rem;
+    line-height: 1.5;
+}
+
+/* Mascot image bottom-right */
+.mascot {
+    position: absolute;
+    bottom: 1rem;
+    right: 1rem;
+}
+
+.mascot img {
+    max-width: 200px;
+    height: auto;
+    animation: floaty 3s ease-in-out infinite;
+}
+
+/* Floaty animation */
+@keyframes floaty {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
+}
+
+/* ---------- Why Work With Us Section ---------- */
+.why-work {
+    position: relative;
+    padding: 4rem 2rem;
+    background: #000;
+    color: #fff;
+    text-align: center;
+}
+
+.why-work h2 {
+    font-size: 2.2rem;
+    margin-bottom: 2rem;
+    font-family: "Georgia", serif;
+}
+
+/* Note card */
+.note-card {
+    display: inline-block;
+    background: #fff;
+    color: #000;
+    padding: 2rem;
+    border-radius: 8px;
+    text-align: left;
+    line-height: 1.6;
+    max-width: 600px;
+    margin: 0 auto 2rem;
+    background-image: repeating-linear-gradient(
+        to bottom,
+        #fff,
+        #fff 28px,
+        #cfd6e0 29px
+    );
+    border-left: 4px solid #ff5fa2;
+}
+
+.note-card ul {
+    margin: 0;
+    padding-left: 1.2rem;
+}
+
+.note-card li {
+    margin-bottom: 0.5rem;
+}
+
+.note-card .fit {
+    margin-top: 1rem;
+    font-weight: bold;
+    color: #ff5fa2;
+}
+
+/* Mission statement (taped note) */
+.mission {
+    display: inline-block;
+    background: #fdfdfd;
+    color: #000;
+    padding: 1.5rem;
+    border-radius: 6px;
+    max-width: 500px;
+    margin: 2rem auto;
+    position: relative;
+    font-family: "Courier New", monospace;
+}
+
+/* Fake tape effect */
+.mission::before,
+.mission::after {
+    content: "";
+    position: absolute;
+    width: 60px;
+    height: 20px;
+    background: #ff8ab8;
+    opacity: 0.85;
+    top: -10px;
+}
+
+.mission::before { left: 20%; transform: rotate(-5deg); }
+.mission::after { right: 20%; transform: rotate(5deg); }
+
+/* Decorations (cat + doodles) */
+.decorations {
+    position: relative;
+    margin-top: 3rem;
+}
+
+.decorations img {
+    position: absolute;
+    max-width: 150px;
+}
+
+.decorations .cat {
+   max-width: 200px;
+   right: 2%;
+   bottom: -60px;
+}
+
+.decorations .doodle-left {
+    left: 5%;
+    top: -30px;
+    transform: rotate(-10deg);
+}
+
+.decorations .doodle-right {
+    right: 13%;
+    top: -100px;
+    transform: rotate(-15deg);
+    max-width: 120px;
+}
+
+
+/* =======================
+   ABOUT PAGE
+   ======================= */
+#about-page { 
+  background: #000;
+  color: #fff;
+  padding: 20px;
+  font-family: "Courier New", monospace;
+}
+
+
+#about-main { 
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* Section cards */
+#about-main section {
+  background: #111016;
+  border: 1px solid #2a2330;
+  border-radius: 12px;
+  padding: 16px;
+  margin: 16px 0;
+  transition: box-shadow 0.3s, border-color 0.3s;
+}
+
+#about-main section:hover {
+  box-shadow: 0 0 18px #ff7ac6;
+  border-color: #ff7ac6;
+}
+
+/* Titles */
+#about-main h2 {
+  color: #ff7ac6;
+  font-size: clamp(1rem, 2.6vw, 1.4rem);
+  margin-bottom: 10px;
+}
+
+/* Paragraphs */
+#about-main p {
+  margin: 8px 0;
+}
+
+/* Lists */
+#about-section ul {
+  margin: 8px 0;
+  padding-left: 18px;
+}
+
+#about-section ul ul {
+  margin-top: 6px;
+  padding-left: 16px;
+}
+
+/* Contributions */
+#contributions-section dt {
+  color: #ff9ad6;
+  font-weight: bold;
+}
+
+#contributions-section dd {
+  margin-left: 18px;
+  margin-bottom: 6px;
+}
+
+/* Group photo */
+#group-photo-section figure {
+  text-align: center;
+}
+
+#group-photo-section img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 10px;
+  border: 2px solid #2a2330;
+}
+
+#group-photo-section figcaption {
+  color: #ffbde6;
+  margin-top: 6px;
+  font-size: 0.95rem;
+}
+
+/* Fun facts table */
+#fun-facts-section table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+#fun-facts-section th,
+#fun-facts-section td {
+  border: 1px solid #2a2330;
+  padding: 10px;
+  text-align: left;
+}
+
+#fun-facts-section thead th {
+  background: #1a1620;
+  color: #ff9ad6;
+  font-family: "Orbitron", sans-serif;
+  text-transform: uppercase;
+}
+
+#fun-facts-section tbody th {
+  background: #15121b;
+  color: #ffbde6;
+  font-weight: bold;
+}
+
+/* Titles fonts */
+#about-page h1,
+#about-page h2,
+#about-page h3 {
+    font-family: "Courier New", monospace;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+
+/* =======================
+   JOBS PAGE
+   ======================= */
+#jobs {
+  background: #000;
+  color: #fff;
+  font-family: "Courier New", monospace;
+  line-height: 1.5;
+  padding: 20px;
+}
+
+#jobs h1, 
+#jobs h2 {
+  color: #ff7ac6;
+  text-transform: uppercase;
+  margin: 1rem 0;
+}
+
+#jobs h3 {
+  color: #ffbde6;
+  margin: .5rem 0;
+}
+
+
+/* Tables */
+#jobs table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+}
+
+#jobs th,
+#jobs td {
+  border: 1px solid #333;
+  padding: 6px;
+  text-align: left;
+}
+
+#jobs th {
+  background: #111;
+  color: #ff7ac6;
+}
+
+/* Lists */
+#jobs ul, 
+#jobs ol {
+  margin: .5rem 0 1rem 1.2rem;
+}
+
+#jobs li {
+  margin-bottom: .25rem;
+}
+
+/* Buttons */
+#jobs .btn {
+  display: inline-block;
+  background: #ff7ac6;
+  color: #000;
+  padding: 6px 12px;
+  border-radius: 15px;
+  font-weight: bold;
+}
+
+/* Jobs page requirements*/
+#jobs aside {
+  width: 25%;              /* takes up a quarter of the page */
+  float: right;            /* floats to the right side */
+  border: 2px solid #ff7ac6; /* visible border (pink to match theme) */
+  margin: 15px;            /* space around the box */
+  padding: 15px;           /* space inside the box */
+  background: #111016;     /* dark background to match design */
+  border-radius: 8px;      /* soften corners */
+}
+
+
+/* =======================
+   APPLY PAGE
+   ======================= */
+.apply-page {
+  background: #000;
+  color: #fff;
+  font-family: "Courier New", monospace;
+  line-height: 1.6;
+}
+
+.apply-hero {
+  text-align: center;
+  color: rgb(224, 224, 224);
+}
+
+#applicationform {
+  background: #111016;
+  border: 1px solid #2a2330;
+  border-radius: 8px;
+  padding: 25px;
+  margin: 30px auto;
+  max-width: 800px;
+}
+
+#applicationform h2 {
+  text-align: center;
+  color: #ff7ac6;
+  margin-bottom: 20px;
+}
+
+#applicationform form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.full-width {
+  grid-column: span 2;
+}
+
+/* Labels */
+.form-group label,
+#applicationform legend {
+  font-weight: bold;
+  margin-bottom: 6px;
+  color: #ff7ac6;
+}
+
+/* Inputs */
+.apply-page input,
+.apply-page select,
+.apply-page textarea {
+  padding: 10px;
+  border: 1px solid #333;
+  border-radius: 6px;
+  background: #15121b;
+  color: #fff;
+  font-size: 1rem;
+}
+
+.apply-page input:focus,
+.apply-page select:focus,
+.apply-page textarea:focus {
+  border-color: #ff7ac6;
+  background: #1e1b25;
+  outline: none;
+}
+
+/* Radios & checkboxes */
+.apply-page input[type="radio"],
+.apply-page input[type="checkbox"] {
+  width: auto;
+  margin-right: 6px;
+}
+
+#applicationform fieldset {
+  border: 2px solid #ff7ac6;
+  background: rgba(255, 122, 198, 0.1);
+  border-radius: 6px;
+  padding: 12px 15px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 20px;
+}
+
+#applicationform fieldset label {
+  color: #fff;
+  font-weight: normal;
+}
+
+/* Buttons */
+.button-container {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  grid-column: span 2;
+  margin-top: 10px;
+}
+
+.apply-page input[type="submit"],
+.apply-page input[type="reset"] {
+  border-radius: 4px;
+  padding: 10px 20px;
+  font-weight: bold;
+  cursor: pointer;
+  border: none;
+}
+
+.apply-page input[type="submit"] {
+  background: #ff7ac6;
+  color: #000;
+}
+
+.apply-page input[type="submit"]:hover {
+  background: #e05599;
+}
+
+.apply-page input[type="reset"] {
+  background: #555;
+  color: #fff;
+}
+
+.apply-page input[type="reset"]:hover {
+  background: #777;
+}
+
+/* Responsive */
+@media (max-width: 700px) {
+  #applicationform form {
+    grid-template-columns: 1fr;
+  }
+  .full-width,
+  .button-container {
+    grid-column: span 1;
+  }
+}
