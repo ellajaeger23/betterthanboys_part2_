@@ -64,6 +64,11 @@ if (!empty($_POST['lastname'])) {
     $params[] = "%" . $_POST['lastname'] . "%";
     $types .= "s";
 }
+if (!empty($_POST['status'])) {
+    $where_clauses[] = "status = ?";
+    $params[] = $_POST['status'];
+    $types .= "s";
+}
 
 $allowed_fields = ['EOInumber', 'firstname', 'lastname', 'job_ref', 'status'];
 $sort_field = isset($_POST['sort_field']) && in_array($_POST['sort_field'], $allowed_fields)
@@ -74,7 +79,21 @@ $sql = "SELECT * FROM eoi";
 if (count($where_clauses) > 0) {
     $sql .= " WHERE " . implode(" AND ", $where_clauses);
 }
-$sql .= " ORDER BY " . ($sort_field === 'EOInumber' ? 'CAST(EOInumber AS UNSIGNED)' : $sort_field);
+if ($sort_field === 'EOInumber') {
+    $sql .= " ORDER BY CAST(EOInumber AS UNSIGNED)";
+} elseif ($sort_field === 'status') {
+    $sql .= " ORDER BY 
+        CASE status
+            WHEN 'New' THEN 1
+            WHEN 'Under Consideration' THEN 2
+            WHEN 'Hired' THEN 3
+            WHEN 'Rejected' THEN 4
+            ELSE 5
+        END";
+} else {
+    $sql .= " ORDER BY $sort_field";
+}
+
 
 $stmt = mysqli_prepare($conn, $sql);
 if ($stmt && count($params) > 0) {
@@ -87,11 +106,10 @@ $result = mysqli_stmt_get_result($stmt);
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Manage EOIs - Doki's Management System</title>
+    <title>Manage EOIs - BTB's Management System</title>
     <link rel="stylesheet" href="styles/style.css">
     <style>
         body {
-            font-family: Arial, sans-serif;
             background-color: #000000ff;
             margin: 0;
             color: #2c3e50;
@@ -161,6 +179,14 @@ $result = mysqli_stmt_get_result($stmt);
             border-collapse: collapse;
             margin-top: 15px;
         }
+        section {
+        overflow-x: auto; /* enable horizontal scroll if table is wider */
+        }
+        table {
+        width: 100%;
+        border-collapse: collapse;
+        background-color: #fff; /* keep table visually white */
+        }
         th, td {
             padding: 12px;
             text-align: center;
@@ -211,7 +237,7 @@ $result = mysqli_stmt_get_result($stmt);
     <p>Role: <?= $isAdmin ? 'Administrator' : 'Manager'; ?></p>
 
     <div style="text-align:center; margin-bottom: 20px;">
-        <a href="logout.php" class="logout-btn">🔒 Logout</a>
+        <a href="logout.php" class="logout-btn">Logout</a>
     </div>
 
     <p>Manage all Expressions of Interest (EOIs) below.</p>
@@ -226,6 +252,8 @@ $result = mysqli_stmt_get_result($stmt);
                     <option value="">All</option>
                     <option value="ED001" <?= (isset($_POST['job_ref']) && $_POST['job_ref'] == 'ED001') ? 'selected' : '' ?>>ED001</option>
                     <option value="DL002" <?= (isset($_POST['job_ref']) && $_POST['job_ref'] == 'DL002') ? 'selected' : '' ?>>DL002</option>
+                    <option value="IT003" <?= (isset($_POST['job_ref']) && $_POST['job_ref'] == 'IT003') ? 'selected' : '' ?>>IT003</option>
+                    <option value="MD004" <?= (isset($_POST['job_ref']) && $_POST['job_ref'] == 'MD004') ? 'selected' : '' ?>>MD004</option>
                 </select>
             </label>
 
@@ -237,6 +265,16 @@ $result = mysqli_stmt_get_result($stmt);
                 <input type="text" name="lastname" value="<?= isset($_POST['lastname']) ? htmlspecialchars($_POST['lastname']) : '' ?>">
             </label>
 
+            <label>Status:
+                 <select name="status">
+                        <option value="">All</option>
+                        <option value="New" <?= (isset($_POST['status']) && $_POST['status'] == 'New') ? 'selected' : '' ?>>New</option>
+                        <option value="Under Consideration" <?= (isset($_POST['status']) && $_POST['status'] == 'Under Consideration') ? 'selected' : '' ?>>Under Consideration</option>
+                        <option value="Hired" <?= (isset($_POST['status']) && $_POST['status'] == 'Hired') ? 'selected' : '' ?>>Hired</option>
+                        <option value="Rejected" <?= (isset($_POST['status']) && $_POST['status'] == 'Rejected') ? 'selected' : '' ?>>Rejected</option>
+                 </select>
+            </label>
+
             <label>Sort by:
                 <select name="sort_field">
                     <?php foreach ($allowed_fields as $field): ?>
@@ -244,7 +282,7 @@ $result = mysqli_stmt_get_result($stmt);
                     <?php endforeach; ?>
                 </select>
             </label>
-
+            
             <input type="submit" value="Search">
         </fieldset>
     </form>
@@ -259,6 +297,8 @@ $result = mysqli_stmt_get_result($stmt);
                     <option value="">Select...</option>
                     <option value="ED001">ED001</option>
                     <option value="DL002">DL002</option>
+                    <option value="IT003">IT003</option>
+                    <option value="MD004">MD004</option>
                 </select>
             </label>
             <button type="submit">Delete</button>

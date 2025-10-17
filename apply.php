@@ -10,7 +10,6 @@ if (!$conn) {
 }
 ?>
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -44,8 +43,23 @@ if (!$conn) {
         <label for="jobref">Job reference number</label>
         <select name="jobref" id="jobref" required>
         <option value="">-- Select a Position --</option>
-        <option value="ED001">ED001 – Educational Technology Developer</option>
-        <option value="DL002">DL002 – Digital Learning Support Officer</option>
+        <?php
+          // Fetch job list dynamically from database (help from GenAI)
+          $query = "SELECT job_ref, job_title FROM jobs ORDER BY job_ref ASC";
+          $result = mysqli_query($conn, $query);
+
+          if ($result && mysqli_num_rows($result) > 0) {
+              while ($row = mysqli_fetch_assoc($result)) {
+                  echo "<option value='" . htmlspecialchars($row['job_ref']) . "'>" .
+                        htmlspecialchars($row['job_ref']) . " – " . htmlspecialchars($row['job_title']) .
+                       "</option>";
+              }
+          } else {
+              echo "<option disabled>No jobs available</option>";
+          }
+          ?>
+        </select>
+      </div>
     </select>
     </div>
 

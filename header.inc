@@ -16,9 +16,9 @@
 
         if (isset($_SESSION['username'])): ?>
             <span style="margin-right:10px;">Welcome, <?= htmlspecialchars($_SESSION['username']); ?></span>
-            <a href="logout.php" class="btn-logout">Logout 🔒</a>
+            <a href="logout.php" class="btn-logout">Logout</a>
         <?php else: ?>
-            <a href="login.php" class="btn-login">Login 🔑</a>
+            <a href="login.php" class="btn-login">Login</a>
         <?php endif; ?>
     </div>
   </nav>

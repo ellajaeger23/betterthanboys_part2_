@@ -51,11 +51,10 @@ mysqli_close($conn);
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Register - Doki’s Management System</title>
+    <title>Register - BTB’s Management System</title>
     <link rel="stylesheet" href="styles/style.css">
     <style>
         body {
-            font-family: Arial, sans-serif;
             background-color: #000;
             margin: 0;
             color: #333;
