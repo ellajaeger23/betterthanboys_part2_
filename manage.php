@@ -85,10 +85,9 @@ if ($sort_field === 'EOInumber') {
     $sql .= " ORDER BY 
         CASE status
             WHEN 'New' THEN 1
-            WHEN 'Under Consideration' THEN 2
-            WHEN 'Hired' THEN 3
-            WHEN 'Rejected' THEN 4
-            ELSE 5
+            WHEN 'Current' THEN 2
+            WHEN 'Final' THEN 3
+            ELSE 4
         END";
 } else {
     $sql .= " ORDER BY $sort_field";
@@ -269,9 +268,8 @@ $result = mysqli_stmt_get_result($stmt);
                  <select name="status">
                         <option value="">All</option>
                         <option value="New" <?= (isset($_POST['status']) && $_POST['status'] == 'New') ? 'selected' : '' ?>>New</option>
-                        <option value="Under Consideration" <?= (isset($_POST['status']) && $_POST['status'] == 'Under Consideration') ? 'selected' : '' ?>>Under Consideration</option>
-                        <option value="Hired" <?= (isset($_POST['status']) && $_POST['status'] == 'Hired') ? 'selected' : '' ?>>Hired</option>
-                        <option value="Rejected" <?= (isset($_POST['status']) && $_POST['status'] == 'Rejected') ? 'selected' : '' ?>>Rejected</option>
+                        <option value="Curent" <?= (isset($_POST['status']) && $_POST['status'] == 'Current') ? 'selected' : '' ?>>Current</option>
+                        <option value="Final" <?= (isset($_POST['status']) && $_POST['status'] == 'Final') ? 'selected' : '' ?>>Final</option>
                  </select>
             </label>
 
@@ -334,9 +332,8 @@ $result = mysqli_stmt_get_result($stmt);
                         <input type='hidden' name='update_eoi' value='{$row['EOInumber']}'>
                         <select name='new_status'>
                             <option value='New' " . ($row['status'] == 'New' ? 'selected' : '') . ">New</option>
-                            <option value='Under Consideration' " . ($row['status'] == 'Under Consideration' ? 'selected' : '') . ">Under Consideration</option>
-                            <option value='Hired' " . ($row['status'] == 'Hired' ? 'selected' : '') . ">Hired</option>
-                            <option value='Rejected' " . ($row['status'] == 'Rejected' ? 'selected' : '') . ">Rejected</option>
+                            <option value='Current' " . ($row['status'] == 'Current' ? 'selected' : '') . ">Current</option>
+                            <option value='Final' " . ($row['status'] == 'Final' ? 'selected' : '') . ">Final</option>
                         </select>
                         <button type='submit'>Update</button>
                     </form>
