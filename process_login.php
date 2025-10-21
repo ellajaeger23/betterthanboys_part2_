@@ -1,4 +1,4 @@
-<?php
+<?php 
 session_start();
 
 // Include database connection settings
@@ -18,18 +18,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $input_username = trim($_POST['username']);
     $input_password = trim($_POST['password']);
 
-    // Prepared statement to fetch user by username
-    $query = "SELECT * FROM users WHERE username = ?";
-    $stmt = mysqli_prepare($conn, $query);
-    mysqli_stmt_bind_param($stmt, "s", $input_username);
-    mysqli_stmt_execute($stmt);
-    $result = mysqli_stmt_get_result($stmt);
+    // Prepare SQL statement to prevent SQL injection
+    $stmt = $conn->prepare("SELECT username, password FROM users WHERE username = ?");
+    $stmt->bind_param("s", $input_username);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
-    if ($user = mysqli_fetch_assoc($result)) {
-        // ⚠️ Plain-text password check (no hashing)
-        if ($input_password === $user['password']) {
+    if ($user = $result->fetch_assoc()) {
+        // ✅ Verify entered password against hashed password
+        if (password_verify($input_password, $user['password'])) {
+            // Login successful
+            session_regenerate_id(true);
 
-            // Store login info in session
             $_SESSION['username'] = $user['username'];
 
             // Assign role automatically
@@ -41,18 +41,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['role'] = 'User';
             }
 
-            // Security: regenerate session ID
-            session_regenerate_id(true);
-
             // Redirect based on role
             if ($_SESSION['role'] === 'Admin' || $_SESSION['role'] === 'Manager') {
                 header("Location: manage.php");
-                exit;
             } else {
                 header("Location: index.php");
-                exit;
             }
-
+            exit;
         } else {
             $_SESSION['error'] = "❌ Invalid username or password.";
             header("Location: login.php");

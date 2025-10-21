@@ -32,6 +32,21 @@ if ($isAdmin && isset($_POST['delete_ref'])) {
     echo "<p class='notice warning'>Managers are not allowed to delete EOIs.</p>";
 }
 
+// --- Handle delete by selected EOIs (Admin only) ---
+if ($isAdmin && isset($_POST['delete_selected']) && !empty($_POST['delete_ids'])) {
+    $ids = $_POST['delete_ids'];
+    $placeholders = implode(',', array_fill(0, count($ids), '?'));
+    $types = str_repeat('i', count($ids));
+
+    $delete_query = "DELETE FROM eoi WHERE EOInumber IN ($placeholders)";
+    $stmt = mysqli_prepare($conn, $delete_query);
+    mysqli_stmt_bind_param($stmt, $types, ...$ids);
+    mysqli_stmt_execute($stmt);
+    $deleted = mysqli_stmt_affected_rows($stmt);
+    echo "<p class='notice delete'>Deleted $deleted selected EOI(s).</p>";
+    mysqli_stmt_close($stmt);
+}
+
 // --- Handle status update ---
 if (isset($_POST['update_eoi']) && isset($_POST['new_status'])) {
     $eoi_id = $_POST['update_eoi'];
@@ -93,7 +108,6 @@ if ($sort_field === 'EOInumber') {
     $sql .= " ORDER BY $sort_field";
 }
 
-
 $stmt = mysqli_prepare($conn, $sql);
 if ($stmt && count($params) > 0) {
     mysqli_stmt_bind_param($stmt, $types, ...$params);
@@ -120,14 +134,10 @@ $result = mysqli_stmt_get_result($stmt);
             padding: 30px;
             border-radius: 10px;
             box-shadow: 0 4px 12px rgba(214, 76, 108, 0.15);
+            overflow-x: auto;
         }
-        h1, h2 {
-            text-align: center;
-            color: #d64c6c;
-        }
-        p {
-            text-align: center;
-        }
+        h1, h2 { text-align: center; color: #d64c6c; }
+        p { text-align: center; }
         fieldset {
             border: 1px solid #f5c3cb;
             border-radius: 10px;
@@ -135,96 +145,44 @@ $result = mysqli_stmt_get_result($stmt);
             margin-bottom: 30px;
             background: #fffafb;
         }
-        legend {
-            color: #d64c6c;
-            font-weight: bold;
-        }
-        form {
-            display: grid;
-            gap: 15px;
-        }
-        label {
-            font-weight: bold;
-            color: #2c3e50;
-        }
-        input[type="text"],
-        select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            background-color: #f9f9f9;
+        legend { color: #d64c6c; font-weight: bold; }
+        form { display: grid; gap: 15px; }
+        label { font-weight: bold; color: #2c3e50; }
+        input[type="text"], select {
+            width: 100%; padding: 10px; border: 1px solid #ccc;
+            border-radius: 5px; background-color: #f9f9f9;
         }
         button, input[type="submit"] {
-            padding: 12px 20px;
-            border-radius: 5px;
-            border: none;
-            background-color: #d64c6c;
-            color: #fff;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-            margin-top: 8px;
+            padding: 12px 20px; border-radius: 5px; border: none;
+            background-color: #d64c6c; color: #fff;
+            cursor: pointer; transition: background-color 0.2s ease; margin-top: 8px;
         }
-        button:hover, input[type="submit"]:hover {
-            background-color: #c23c5d;
-        }
-        hr {
-            margin: 40px 0;
-            border: none;
-            border-top: 1px solid #f1b6c3;
-        }
+        button:hover, input[type="submit"]:hover { background-color: #c23c5d; }
         table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-        }
-        section {
-        overflow-x: auto; /* enable horizontal scroll if table is wider */
-        }
-        table {
-        width: 100%;
-        border-collapse: collapse;
-        background-color: #fff; /* keep table visually white */
+            width: 100%; border-collapse: collapse; background-color: #fff; margin-top: 15px;
         }
         th, td {
-            padding: 12px;
-            text-align: center;
-            border: 1px solid #f0cbd3;
+            padding: 12px; text-align: center; border: 1px solid #f0cbd3;
         }
-        th {
-            background-color: #fbe7ec;
-            color: #2c3e50;
-        }
-        tr:nth-child(even) {
-            background-color: #fff5f7;
-        }
-        tr:hover {
-            background-color: #ffeef1;
-        }
+        th { background-color: #fbe7ec; color: #2c3e50; }
+        tr:nth-child(even) { background-color: #fff5f7; }
+        tr:hover { background-color: #ffeef1; }
         .notice {
-            background: #fde5e8;
-            border-left: 4px solid #d64c6c;
-            padding: 10px 15px;
-            margin: 10px auto;
-            border-radius: 5px;
-            width: fit-content;
+            background: #fde5e8; border-left: 4px solid #d64c6c;
+            padding: 10px 15px; margin: 10px auto; border-radius: 5px; width: fit-content;
         }
         .notice.success { border-left-color: green; background: #e9fbe9; }
         .notice.delete { border-left-color: #d64c6c; background: #fde5e8; }
         .notice.warning { border-left-color: #f39c12; background: #fff3cd; }
-
         .logout-btn {
-            display: inline-block;
-            background-color: #d64c6c;
-            color: #fff;
-            padding: 10px 20px;
-            border-radius: 5px;
-            text-decoration: none;
-            font-weight: bold;
-            transition: background-color 0.2s ease;
+            display: inline-block; background-color: #d64c6c;
+            color: #fff; padding: 10px 20px; border-radius: 5px;
+            text-decoration: none; font-weight: bold; transition: background-color 0.2s ease;
         }
-        .logout-btn:hover {
-            background-color: #c23c5d;
+        .logout-btn:hover { background-color: #c23c5d; }
+        .visually-hidden {
+            position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+            overflow: hidden; clip: rect(0, 0, 0, 0); border: 0;
         }
     </style>
 </head>
@@ -245,7 +203,6 @@ $result = mysqli_stmt_get_result($stmt);
     <form method="post" action="manage.php">
         <fieldset>
             <legend>Search / Filter EOIs</legend>
-
             <label>Job Reference:
                 <select name="job_ref">
                     <option value="">All</option>
@@ -255,24 +212,20 @@ $result = mysqli_stmt_get_result($stmt);
                     <option value="MD004" <?= (isset($_POST['job_ref']) && $_POST['job_ref'] == 'MD004') ? 'selected' : '' ?>>MD004</option>
                 </select>
             </label>
-
             <label>First Name:
                 <input type="text" name="firstname" value="<?= isset($_POST['firstname']) ? htmlspecialchars($_POST['firstname']) : '' ?>">
             </label>
-
             <label>Last Name:
                 <input type="text" name="lastname" value="<?= isset($_POST['lastname']) ? htmlspecialchars($_POST['lastname']) : '' ?>">
             </label>
-
             <label>Status:
-                 <select name="status">
-                        <option value="">All</option>
-                        <option value="New" <?= (isset($_POST['status']) && $_POST['status'] == 'New') ? 'selected' : '' ?>>New</option>
-                        <option value="Curent" <?= (isset($_POST['status']) && $_POST['status'] == 'Current') ? 'selected' : '' ?>>Current</option>
-                        <option value="Final" <?= (isset($_POST['status']) && $_POST['status'] == 'Final') ? 'selected' : '' ?>>Final</option>
-                 </select>
+                <select name="status">
+                    <option value="">All</option>
+                    <option value="New" <?= (isset($_POST['status']) && $_POST['status'] == 'New') ? 'selected' : '' ?>>New</option>
+                    <option value="Current" <?= (isset($_POST['status']) && $_POST['status'] == 'Current') ? 'selected' : '' ?>>Current</option>
+                    <option value="Final" <?= (isset($_POST['status']) && $_POST['status'] == 'Final') ? 'selected' : '' ?>>Final</option>
+                </select>
             </label>
-
             <label>Sort by:
                 <select name="sort_field">
                     <?php foreach ($allowed_fields as $field): ?>
@@ -280,7 +233,6 @@ $result = mysqli_stmt_get_result($stmt);
                     <?php endforeach; ?>
                 </select>
             </label>
-            
             <input type="submit" value="Search">
         </fieldset>
     </form>
@@ -290,15 +242,14 @@ $result = mysqli_stmt_get_result($stmt);
     <form method="post" action="manage.php">
         <fieldset>
             <legend>Delete EOIs by Job Reference (Admin Only)</legend>
-            <label>Job Reference:
-                <select name="delete_ref" required>
-                    <option value="">Select...</option>
-                    <option value="ED001">ED001</option>
-                    <option value="DL002">DL002</option>
-                    <option value="IT003">IT003</option>
-                    <option value="MD004">MD004</option>
-                </select>
-            </label>
+            <label for="delete_ref">Job Reference:</label>
+            <select id="delete_ref" name="delete_ref" required>
+                <option value="">Select...</option>
+                <option value="ED001">ED001</option>
+                <option value="DL002">DL002</option>
+                <option value="IT003">IT003</option>
+                <option value="MD004">MD004</option>
+            </select>
             <button type="submit">Delete</button>
         </fieldset>
     </form>
@@ -309,28 +260,31 @@ $result = mysqli_stmt_get_result($stmt);
     <h2>EOI Records</h2>
     <?php
     if (mysqli_num_rows($result) > 0) {
+        if ($isAdmin) echo '<form method="post" action="manage.php"><fieldset><legend>Select EOIs to Delete</legend>';
+
         echo "<table>";
-        echo "<tr>
-                <th>EOI #</th>
-                <th>Job Ref</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Phone</th>
-                <th>Status</th>
-                <th>Change Status</th>
-              </tr>";
+        echo "<tr>";
+        if ($isAdmin) echo "<th>Select</th>";
+        echo "<th>EOI #</th><th>Job Ref</th><th>Name</th><th>Email</th><th>Phone</th><th>Status</th><th>Change Status</th></tr>";
+
         while ($row = mysqli_fetch_assoc($result)) {
             echo "<tr>";
-            echo "<td>{$row['EOInumber']}</td>";
-            echo "<td>{$row['job_ref']}</td>";
-            echo "<td>{$row['firstname']} {$row['lastname']}</td>";
-            echo "<td>{$row['email']}</td>";
-            echo "<td>{$row['phone']}</td>";
-            echo "<td>{$row['status']}</td>";
-            echo "<td>
-                    <form method='post' action='manage.php' style='display:inline;'>
+            if ($isAdmin) {
+                $labelId = "eoi_" . htmlspecialchars($row['EOInumber']);
+                echo "<td><input type='checkbox' id='{$labelId}' name='delete_ids[]' value='{$row['EOInumber']}'>
+                      <label for='{$labelId}' class='visually-hidden'>Select EOI {$row['EOInumber']}</label></td>";
+            }
+            echo "<td>{$row['EOInumber']}</td>
+                  <td>{$row['job_ref']}</td>
+                  <td>{$row['firstname']} {$row['lastname']}</td>
+                  <td>{$row['email']}</td>
+                  <td>{$row['phone']}</td>
+                  <td>{$row['status']}</td>
+                  <td>
+                    <form method='post' action='manage.php' style='display:inline;' aria-label='Update status for EOI {$row['EOInumber']}'>
                         <input type='hidden' name='update_eoi' value='{$row['EOInumber']}'>
-                        <select name='new_status'>
+                        <label for='status_{$row['EOInumber']}' class='visually-hidden'>Change status</label>
+                        <select id='status_{$row['EOInumber']}' name='new_status'>
                             <option value='New' " . ($row['status'] == 'New' ? 'selected' : '') . ">New</option>
                             <option value='Current' " . ($row['status'] == 'Current' ? 'selected' : '') . ">Current</option>
                             <option value='Final' " . ($row['status'] == 'Final' ? 'selected' : '') . ">Final</option>
@@ -340,7 +294,12 @@ $result = mysqli_stmt_get_result($stmt);
                   </td>";
             echo "</tr>";
         }
+
         echo "</table>";
+        if ($isAdmin) {
+            echo '<button type="submit" name="delete_selected" style="margin-top:15px;">🗑️ Delete Selected EOIs</button>';
+            echo '</fieldset></form>';
+        }
     } else {
         echo "<p class='notice'>No EOIs found.</p>";
     }

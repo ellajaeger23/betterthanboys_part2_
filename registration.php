@@ -20,9 +20,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } elseif ($password !== $confirm) {
         $message = "<p class='error'>❌ Passwords do not match.</p>";
     } else {
-        // Check if username exists
+        // Check if username already exists
         $check_sql = "SELECT * FROM users WHERE username = ?";
-        $stmt = mysqli_prepare($conn, $check_sql);
+        $stmt = mysqli_prepare($conn, $check_sql); 
         mysqli_stmt_bind_param($stmt, "s", $username);
         mysqli_stmt_execute($stmt);
         $result = mysqli_stmt_get_result($stmt);
@@ -30,14 +30,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if (mysqli_num_rows($result) > 0) {
             $message = "<p class='error'>🚫 Username already exists.</p>";
         } else {
-            // ⚠️ Store password in plain text (for testing only)
+            // ✅ Hash password securely before inserting
+            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+
             $insert_sql = "INSERT INTO users (username, password) VALUES (?, ?)";
             $stmt = mysqli_prepare($conn, $insert_sql);
-            mysqli_stmt_bind_param($stmt, "ss", $username, $password);
+            mysqli_stmt_bind_param($stmt, "ss", $username, $hashed_password);
+
             if (mysqli_stmt_execute($stmt)) {
                 $message = "<p class='success'>✅ Registration successful! <a href='login.php'>Login here</a>.</p>";
             } else {
-                $message = "<p class='error'>❌ Registration failed. Please try again.</p>";
+                $message = "<p class='error'>❌ Registration failed. Please try again later.</p>";
             }
         }
         mysqli_stmt_close($stmt);
@@ -46,7 +49,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 mysqli_close($conn);
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -133,7 +135,9 @@ mysqli_close($conn);
         <button type="submit">Register</button>
     </form>
 
-    <p style="text-align:center; margin-top:15px;">Already have an account? <a href="login.php">Login here</a>.</p>
+    <p style="text-align:center; margin-top:15px;">
+        Already have an account? <a href="login.php">Login here</a>.
+    </p>
 </section>
 <?php include "footer.inc"; ?>
 </body>
