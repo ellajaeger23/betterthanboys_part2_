@@ -1,4 +1,5 @@
 <?php
+// This code was assisted by ChatGPT (OpenAI)
 session_start();
 
 // Redirect if not logged in

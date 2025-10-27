@@ -1,4 +1,5 @@
 <?php 
+// This code was assisted by Ati lab 10
 session_start();
 
 // Include database connection settings
