@@ -39,6 +39,21 @@ CREATE TABLE IF NOT EXISTS eoi (
 ";
 mysqli_query($conn, $createTableSQL);
 
+// --- Insert sample data if table is empty ---
+$checkSample = mysqli_query($conn, "SELECT COUNT(*) AS total FROM eoi");
+$count = mysqli_fetch_assoc($checkSample)['total'];
+
+if ($count == 0) {
+    $sampleSQL = "
+    INSERT INTO eoi (job_ref, firstname, lastname, dob, gender, street, suburb, state, postcode, email, phone, skills, other_info, status)
+    VALUES
+    ('ED001', 'Alice', 'Nguyen', '1998-03-22', 'Female', '12 Elm Street', 'Melbourne', 'VIC', '3000', 'alice@example.com', '0412345678', 'Communication, Teamwork', 'Experienced in education sector', 'New'),
+    ('DL002', 'Ben', 'Tran', '1995-07-19', 'Male', '45 Oak Road', 'Sydney', 'NSW', '2000', 'ben.tran@example.com', 'Leadership, Problem Solving', 'Worked in logistics for 3 years', 'Current'),
+    ('IT003', 'Chloe', 'Pham', '2000-12-01', 'Female', '78 Maple Ave', 'Brisbane', 'QLD', '4000', 'chloe.pham@example.com', 'Python, AWS, Security', 'Looking for IT opportunities', 'Final');
+    ";
+    mysqli_query($conn, $sampleSQL);
+}
+
 // --- Collect and clean form data ---
 $jobref     = trim($_POST['jobref']);
 $firstname  = trim($_POST['firstname']);
