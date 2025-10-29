@@ -8,6 +8,51 @@
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
 </head>
 
+ <style>
+    /* ===== Contributions Table Styling ===== */
+    .contributions-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1.5rem;
+      background-color: #111;
+      color: #fff;
+      font-family: 'Orbitron', sans-serif;
+      border: 1px solid #333;
+      box-shadow: 0 0 10px rgba(255, 122, 194, 0.3);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .contributions-table th,
+    .contributions-table td {
+      border: 1px solid #333;
+      padding: 12px 16px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .contributions-table th {
+      background-color: #1a1a1a;
+      color: #ff7bc2;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .contributions-table tr:nth-child(even) {
+      background-color: #181818;
+    }
+
+    .contributions-table tr:hover {
+      background-color: #222;
+      transition: background-color 0.2s ease-in-out;
+    }
+
+    .contributions-table td {
+      font-family: 'Courier New', monospace;
+      line-height: 1.4;
+    }
+  </style>
+  
 <body id="about-page">
 
   <!-- Include Header -->
@@ -37,18 +82,58 @@
       <p>For BTB to run, we are managed by tutor <strong>Razeen</strong></p>
     </section>
 
-    <!-- Contributions Section -->
+       <!-- Contributions Section -->
     <section id="contributions-section">
       <h2>Contributions</h2>
-      <dl>
-        <dt>Mino</dt>
-        <dd>Responsible for developing the Index and Apply pages, and designing the project logo.</dd>
-        <dt>Ella</dt>
-        <dd>Responsible for developing the About and Job pages, and Jira management.</dd>
-        <dt>Allie</dt>
-        <dd>Responsible for developing the Job and Apply pages, and Github.</dd>
-      </dl>
+
+      <?php
+      // --- Database Connection ---
+      $host = "localhost";    // your DB host
+      $user = "root";         // your DB username
+      $pass = "";             // your DB password
+      $dbname = "betterthanboys_db";        // your DB name
+
+      // Create connection
+      $conn = new mysqli($host, $user, $pass, $dbname);
+
+      // Check connection
+      if ($conn->connect_error) {
+          die("<p>Connection failed: " . $conn->connect_error . "</p>");
+      }
+
+      // Fetch data
+      $sql = "SELECT id, name, role, contribution_project1, contribution_project2 FROM members";
+      $result = $conn->query($sql);
+
+      if ($result && $result->num_rows > 0) {
+          echo "<table class='contributions-table'>";
+          echo "<tr>
+                  <th>Name</th>
+                  <th>Role</th>
+                  <th>Project 1 Contribution</th>
+                  <th>Project 2 Contribution</th>
+                </tr>";
+
+          while ($row = $result->fetch_assoc()) {
+              echo "<tr>
+                      <td>" . htmlspecialchars($row['name']) . "</td>
+                      <td>" . htmlspecialchars($row['role']) . "</td>
+                      <td>" . htmlspecialchars($row['contribution_project1']) . "</td>
+                      <td>" . htmlspecialchars($row['contribution_project2']) . "</td>
+                    </tr>";
+          }
+
+          echo "</table>";
+      } else {
+          echo "<p>No contributions found.</p>";
+      }
+
+      $conn->close();
+      ?>
+
     </section>
+
+
 
     <!-- Group Photo Section -->
     <section id="group-photo-section">
